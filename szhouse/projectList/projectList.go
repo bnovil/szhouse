@@ -58,7 +58,7 @@ func main() {
 
 	var page int
 
-	for page = 1; page <= 10; page++ {
+	for page = 1; page <= 50; page++ {
 		resp := requestForData(url, page, 10)
 
 		log.Println("==== parse start ====")
@@ -71,7 +71,7 @@ func main() {
 
 	}
 
-	writeToFile("20190804_100_houst_projectlist.txt", ProjectBriefList)
+	writeToFile("500_house_projectlist.txt", ProjectBriefList)
 
 }
 
