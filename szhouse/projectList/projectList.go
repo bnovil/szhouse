@@ -9,6 +9,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -42,10 +43,14 @@ ProjectBriefList ，project list
 var ProjectBriefList []ProjectBrief
 
 var (
-	maxPage   = 100
+	maxPage   = 50
 	pageSize  = 10
 	startPage = 1
 )
+
+var briefChan = make(chan ProjectBrief, 10)
+
+var wg sync.WaitGroup
 
 func main() {
 	url := projectList
@@ -64,18 +69,33 @@ func main() {
 
 	var page int
 
-	for page = startPage; page <= maxPage; page++ {
-		resp := requestForData(url, page, pageSize)
+	wg.Add(1)
+	go func() {
+		for page = startPage; page <= maxPage; page++ {
+			resp := requestForData(url, page, pageSize)
 
-		log.Println("==== parse start ====")
+			log.Println("==== parse start ====")
 
-		parseData(resp.Body)
+			parseData(resp.Body)
 
-		// for debug
-		// b, _ := json.Marshal(ProjectBriefList)
-		// log.Printf("result : %s", string(b))
+			// for debug
+			// b, _ := json.Marshal(ProjectBriefList)
+			// log.Printf("result : %s", string(b))
 
-	}
+		}
+		defer close(briefChan)
+		defer wg.Done()
+	}()
+
+	wg.Add(1)
+	go func() {
+		for b := range briefChan {
+			ProjectBriefList = append(ProjectBriefList, b)
+		}
+		wg.Done()
+	}()
+
+	wg.Wait()
 
 	fname := strconv.Itoa(maxPage*pageSize) + "_house_projectlist.txt"
 
@@ -213,7 +233,10 @@ func parseData(respBody io.ReadCloser) {
 
 		})
 
-		ProjectBriefList = append(ProjectBriefList, b)
+		briefChan <- b
+
+		// log.Println("add to channel")
+		// ProjectBriefList = append(ProjectBriefList, b)
 
 	})
 }
