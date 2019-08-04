@@ -37,9 +37,15 @@ type ProjectBrief struct {
 }
 
 /*
-  ProjectBriefList,  project list
+ProjectBriefList ，project list
 */
 var ProjectBriefList []ProjectBrief
+
+var (
+	maxPage   = 100
+	pageSize  = 10
+	startPage = 1
+)
 
 func main() {
 	url := projectList
@@ -58,8 +64,8 @@ func main() {
 
 	var page int
 
-	for page = 1; page <= 50; page++ {
-		resp := requestForData(url, page, 10)
+	for page = startPage; page <= maxPage; page++ {
+		resp := requestForData(url, page, pageSize)
 
 		log.Println("==== parse start ====")
 
@@ -71,7 +77,9 @@ func main() {
 
 	}
 
-	writeToFile("500_house_projectlist.txt", ProjectBriefList)
+	fname := strconv.Itoa(maxPage*pageSize) + "_house_projectlist.txt"
+
+	writeToFile(fname, ProjectBriefList)
 
 }
 
