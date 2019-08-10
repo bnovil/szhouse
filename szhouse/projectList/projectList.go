@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crawl/szhouse/projectList/dao"
+	"crawl/szhouse/projectList/data"
 	"encoding/json"
 	"io"
 	"log"
@@ -24,23 +26,9 @@ var (
 )
 
 /*
-ProjectBrief , brief information
-*/
-type ProjectBrief struct {
-	Seq         string
-	PreNumber   string
-	NumberLink  string
-	Name        string
-	NameLink    string
-	Company     string
-	District    string
-	ApproveTime string
-}
-
-/*
 ProjectBriefList ，project list
 */
-var ProjectBriefList []ProjectBrief
+var ProjectBriefList []data.ProjectBrief
 
 var (
 	maxPage   = 50
@@ -48,7 +36,7 @@ var (
 	startPage = 1
 )
 
-var briefChan = make(chan ProjectBrief, 10)
+var briefChan = make(chan data.ProjectBrief, 10)
 
 var wg sync.WaitGroup
 
@@ -78,9 +66,6 @@ func main() {
 
 			parseData(resp.Body)
 
-			// for debug
-			// b, _ := json.Marshal(ProjectBriefList)
-			// log.Printf("result : %s", string(b))
 
 		}
 		defer close(briefChan)
@@ -91,6 +76,7 @@ func main() {
 	go func() {
 		for b := range briefChan {
 			ProjectBriefList = append(ProjectBriefList, b)
+			dao.Insert(b)
 		}
 		wg.Done()
 	}()
@@ -143,7 +129,7 @@ func requestForData(posturl string, curPage, size int) *http.Response {
 /*
  save to file
 */
-func writeToFile(fileName string, list []ProjectBrief) {
+func writeToFile(fileName string, list []data.ProjectBrief) {
 	log.Printf("begin write file , size:%d", len(list))
 
 	fo, err := os.Create(fileName)
@@ -166,9 +152,6 @@ func writeToFile(fileName string, list []ProjectBrief) {
 
 		_, e := fo.WriteString(string(l) + "\n")
 
-		// fo.Sync()
-		defer fo.Close()
-
 		if e != nil {
 			log.Println(e)
 		}
@@ -190,7 +173,7 @@ func parseData(respBody io.ReadCloser) {
 
 		one := selection.Find("td")
 
-		b := ProjectBrief{}
+		b := data.ProjectBrief{}
 
 		one.Each(func(num int, sel *goquery.Selection) {
 
@@ -210,6 +193,9 @@ func parseData(respBody io.ReadCloser) {
 				b.PreNumber = val
 				v, _ := sel.Find("a").Attr("href")
 				b.NumberLink = strings.Trim(v, ".") // remove dot
+
+				seqLink := strings.Split(b.NumberLink, "=")
+				b.Id, _ = strconv.Atoi(seqLink[1])
 
 				break
 			case 2:
