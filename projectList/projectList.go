@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"szhouse/szhouse/projectList/dao"
-	"szhouse/szhouse/projectList/data"
+	"szhouse/projectList/dao"
+	"szhouse/projectList/data"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -31,7 +31,7 @@ ProjectBriefList ，project list
 var ProjectBriefList []data.ProjectBrief
 
 var (
-	maxPage   = 1
+	maxPage   = 50
 	pageSize  = 10
 	startPage = 1
 )

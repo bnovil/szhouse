@@ -1,12 +1,12 @@
 package dao
 
-
 import (
 	"log"
 	"sync"
 
 	_ "github.com/go-sql-driver/mysql" //mysql driver
 	"github.com/jinzhu/gorm"
+	"szhouse/projectList/data"
 )
 
 var db *gorm.DB
@@ -31,7 +31,7 @@ const dsn string = "test:test123@tcp(localhost:3306)/szhouse?charset=utf8&parseT
 /*
 Insert new record
 */
-func Insert(b ProjectBrief) bool {
+func Insert(b data.ProjectBrief) bool {
 
 	e := GetDBConn().Table("project_brief").Create(&b).Error
 	if e != nil {
