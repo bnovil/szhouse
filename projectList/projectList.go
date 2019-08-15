@@ -1,8 +1,6 @@
 package main
 
 import (
-	"crawl/szhouse/projectList/dao"
-	"crawl/szhouse/projectList/data"
 	"encoding/json"
 	"io"
 	"log"
@@ -12,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"szhouse/szhouse/projectList/dao"
+	"szhouse/szhouse/projectList/data"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -31,7 +31,7 @@ ProjectBriefList ，project list
 var ProjectBriefList []data.ProjectBrief
 
 var (
-	maxPage   = 50
+	maxPage   = 1
 	pageSize  = 10
 	startPage = 1
 )

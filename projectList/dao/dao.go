@@ -1,7 +1,7 @@
 package dao
 
+
 import (
-	"crawl/szhouse/projectList/data"
 	"log"
 	"sync"
 
@@ -31,7 +31,7 @@ const dsn string = "test:test123@tcp(localhost:3306)/szhouse?charset=utf8&parseT
 /*
 Insert new record
 */
-func Insert(b data.ProjectBrief) bool {
+func Insert(b ProjectBrief) bool {
 
 	e := GetDBConn().Table("project_brief").Create(&b).Error
 	if e != nil {
